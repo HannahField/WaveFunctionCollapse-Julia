@@ -7,11 +7,11 @@ struct Tile
 end
 
 mutable struct Cell
-    currentTiles::Vector{Tile}
-    northCompatible::Vector{Tile}
-    eastCompatible::Vector{Tile}
-    southCompatible::Vector{Tile}
-    westCompatible::Vector{Tile}
+    currentTiles::Set{Tile}
+    northCompatible::Set{Tile}
+    eastCompatible::Set{Tile}
+    southCompatible::Set{Tile}
+    westCompatible::Set{Tile}
     collapsed::Bool
 end
 
@@ -28,19 +28,21 @@ tiles = [
     Tile(0, 0, 0, 0, 5)
 ]
 
+tile_set = Set(tiles)
+
 struct TileCompatibility
     tile::Tile
-    northNeighbors::Vector{Tile}
-    eastNeighbors::Vector{Tile}
-    southNeighbors::Vector{Tile}
-    westNeighbors::Vector{Tile}
+    northNeighbors::Set{Tile}
+    eastNeighbors::Set{Tile}
+    southNeighbors::Set{Tile}
+    westNeighbors::Set{Tile}
 end
 
 function findCompatibility(tile, tiles)
-    northCompatibility = filter(x -> x.southSocketID == tile.northSocketID, tiles)
-    eastCompatibility = filter(x -> x.westSocketID == tile.eastSocketID, tiles)
-    southCompatibility = filter(x -> x.northSocketID == tile.southSocketID, tiles)
-    westCompatibility = filter(x -> x.eastSocketID == tile.westSocketID, tiles)
+    northCompatibility = Set(filter(x -> x.southSocketID == tile.northSocketID, tiles))
+    eastCompatibility = Set(filter(x -> x.westSocketID == tile.eastSocketID, tiles))
+    southCompatibility = Set(filter(x -> x.northSocketID == tile.southSocketID, tiles))
+    westCompatibility = Set(filter(x -> x.eastSocketID == tile.westSocketID, tiles))
     return TileCompatibility(tile, northCompatibility, eastCompatibility, southCompatibility, westCompatibility)
 end
 
@@ -49,12 +51,12 @@ tileCompatibility = Dict(map(x -> (x, findCompatibility(x, tiles)), tiles))
 
 gridSize = (4, 4)
 
-baseCell() = Cell(tiles, tiles, tiles, tiles, tiles, false)
+baseCell() = Cell(tile_set, tile_set, tile_set, tile_set, tile_set, false)
 
 grid = Grid(map(_ -> baseCell(), ones(gridSize)))
 
 function propagate!(grid, index)
-    neighborsIndeces = findNeighborsIndex(index,size(grid.cells))
+    neighborsIndeces = findNeighborsIndex(index, size(grid.cells))
     nonCollapsedNeighbors = filter(x -> !grid.cells[x...].collapsed, neighborsIndeces)
 
 end
@@ -66,12 +68,12 @@ function collapse!(grid)
 
     possibleOutcomes = leastEntropyCell.currentTiles
     outcome = rand(possibleOutcomes)
-    grid.cells[index].currentTiles = [outcome]
+    grid.cells[index].currentTiles = Set([outcome])
     propagate!(grid, index)
 end
 
 function findLeastEntropy(grid)
-    _, index = findmin(map(x -> length(x.currentTiles)+(!x.collapsed ? 0 : 10),grid.cells))
+    _, index = findmin(map(x -> length(x.currentTiles) + (!x.collapsed ? 0 : 10), grid.cells))
     return index
 end
 
