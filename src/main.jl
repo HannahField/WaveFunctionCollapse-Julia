@@ -15,7 +15,7 @@ mutable struct Cell
     collapsed::Bool
 end
 
-mutable struct Grid
+struct Grid
     cells::Matrix{Cell}
 end
 
@@ -47,32 +47,36 @@ end
 tileCompatibility = Dict(map(x -> (x, findCompatibility(x, tiles)), tiles))
 
 
-size = (4, 4)
+gridSize = (4, 4)
 
 baseCell() = Cell(tiles, tiles, tiles, tiles, tiles, false)
 
-grid = Grid(map(_ -> baseCell(), ones(size)))
+grid = Grid(map(_ -> baseCell(), ones(gridSize)))
 
 function propagate!(grid, index)
+    neighborsIndeces = findNeighborsIndex(index,size(grid.cells))
+    nonCollapsedNeighbors = filter(x -> !grid.cells[x...].collapsed, neighborsIndeces)
 
 end
 
 function collapse!(grid)
     index = findLeastEntropy(grid)
+
     leastEntropyCell = grid.cells[index]
 
     possibleOutcomes = leastEntropyCell.currentTiles
     outcome = rand(possibleOutcomes)
-    grid.cells[index].currentTiles = outcome
+    grid.cells[index].currentTiles = [outcome]
     propagate!(grid, index)
 end
 
 function findLeastEntropy(grid)
-    _, index = findmin(map(x -> length(x.currentTiles), filter(x -> !x.collapsed, grid.cells)))
+    _, index = findmin(map(x -> length(x.currentTiles)+(!x.collapsed ? 0 : 10),grid.cells))
     return index
 end
 
 function findNeighborsIndex(index, size)
+
     indeces = [
         (index[1] - 1, index[2])
         (index[1], index[2] + 1)
@@ -82,3 +86,4 @@ function findNeighborsIndex(index, size)
     filter!(x -> x[1] in 1:size[1] && x[2] in 1:size[2], indeces)
     return indeces
 end
+collapse!(grid)
