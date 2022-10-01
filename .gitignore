@@ -1,3 +1,4 @@
 Test.png
 examples/t-block/test.png
 examples/pipes/test.png
+*/**/test*.png

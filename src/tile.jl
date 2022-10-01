@@ -21,3 +21,4 @@ function find_compatibility(tile::Tile, tiles::Set{Tile})
     west_compatibility = Set(filter(x -> x.east_socket_ID == tile.west_socket_ID, tiles))
     return TileCompatibility(tile, north_compatibility, east_compatibility, south_compatibility, west_compatibility)
 end
+
