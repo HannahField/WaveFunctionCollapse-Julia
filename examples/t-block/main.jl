@@ -16,4 +16,4 @@ image_map = Dict(map(x -> (x.tile_ID, FileIO.load(string(@__DIR__,"/tiles/Tile",
 
 image_data = WFC.create_image(image,image_map)
 
-FileIO.save(string(@__DIR__,"/test.png"),image_data)
+FileIO.save(string(@__DIR__,"/example.png"),image_data)
