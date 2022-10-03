@@ -30,6 +30,7 @@ image_grid = WFC.wave_function_collapse(tile_set,(12,12))
 
 
 
+
 #image_map = Dict(map(x -> (x.tile_ID, FileIO.load(string(@__DIR__,"/tiles/Tile", x.tile_ID[1], ".png"))), tiles))
 basic_image_data = Dict(map(x -> (x.tile_ID[1], FileIO.load(string(@__DIR__,"/tiles/Tile", x.tile_ID[1], ".png"))), tiles))
 

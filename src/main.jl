@@ -55,6 +55,7 @@ function create_image_map(tile_set::Set{Tile},basic_image_data::Dict{UInt,Matrix
             tile_image = tile_image[end:-1:1,:]        
         end
         image_data[tile.tile_ID] = tile_image
+        
     end
     return image_data
 end
