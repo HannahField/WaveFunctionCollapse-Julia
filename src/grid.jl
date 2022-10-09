@@ -15,7 +15,6 @@ function propagate!(grid::Grid, index::Tuple{UInt,UInt})::Nothing
             (-1, 0) => current_cell.south_compatible
             (0, 1) => current_cell.west_compatible
         end
-        #println(directionCompatibility)
         new_current_tiles = intersect(grid.cells[i...].current_tiles, direction_compatibility)
         if !(new_current_tiles == grid.cells[i...].current_tiles)
             grid.cells[i...].current_tiles = new_current_tiles
