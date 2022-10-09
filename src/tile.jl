@@ -10,11 +10,11 @@ basic(tile_id::TileID) = tile_id.rotation == 0 && !tile_id.mirrored
 new_basic_tile_id(id::Integer) = TileID(id, 0, false)
 
 struct Tile
-    north_socket_ID::UInt
-    east_socket_ID::UInt
-    south_socket_ID::UInt
-    west_socket_ID::UInt
-    tile_ID::TileID
+    north_socket_id::UInt
+    east_socket_id::UInt
+    south_socket_id::UInt
+    west_socket_id::UInt
+    tile_id::TileID
 end
 
 struct TileCompatibility
@@ -26,10 +26,10 @@ struct TileCompatibility
 end
 
 function find_compatibility(tile::Tile, tiles::Set{Tile})
-    north_compatibility = Set(filter(x -> x.south_socket_ID == tile.north_socket_ID, tiles))
-    east_compatibility = Set(filter(x -> x.west_socket_ID == tile.east_socket_ID, tiles))
-    south_compatibility = Set(filter(x -> x.north_socket_ID == tile.south_socket_ID, tiles))
-    west_compatibility = Set(filter(x -> x.east_socket_ID == tile.west_socket_ID, tiles))
+    north_compatibility = Set(filter(x -> x.south_socket_id == tile.north_socket_id, tiles))
+    east_compatibility = Set(filter(x -> x.west_socket_id == tile.east_socket_id, tiles))
+    south_compatibility = Set(filter(x -> x.north_socket_id == tile.south_socket_id, tiles))
+    west_compatibility = Set(filter(x -> x.east_socket_id == tile.west_socket_id, tiles))
     return TileCompatibility(tile, north_compatibility, east_compatibility, south_compatibility, west_compatibility)
 end
 
@@ -47,7 +47,7 @@ function create_tile_set(tile::Tile, rotation::Int, reflection::Bool)
     end
     tile_set = union(tile_set, Set(rotated_tiles))
     if reflection
-        reflected_tile = Tile(new_tile.south_socket_ID, new_tile.east_socket_ID, new_tile.north_socket_ID, new_tile.west_socket_ID, (new_tile.tile_ID.id, 0, true))
+        reflected_tile = Tile(new_tile.south_socket_id, new_tile.east_socket_id, new_tile.north_socket_id, new_tile.west_socket_id, (new_tile.tile_id.id, 0, true))
         tile_set = union(tile_set, Set(reflected_tile))
         rotated_reflected_tiles = @match rotation begin
             1 => []
@@ -64,13 +64,13 @@ function create_tile_set(tile::Tile, rotation::Int, reflection::Bool)
 end
 
 rotate_tile(tile::Tile)::Tile = Tile(
-    tile.west_socket_ID,
-    tile.north_socket_ID,
-    tile.east_socket_ID,
-    tile.south_socket_ID,
+    tile.west_socket_id,
+    tile.north_socket_id,
+    tile.east_socket_id,
+    tile.south_socket_id,
     TileID(
-        tile.tile_ID.id,
-        tile.tile_ID.rotation + 1,
-        tile.tile_ID.mirrored
+        tile.tile_id.id,
+        tile.tile_id.rotation + 1,
+        tile.tile_id.mirrored
     )
 )

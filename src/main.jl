@@ -31,11 +31,11 @@ function wave_function_collapse(tile_set::Set{Tile}, grid_size::Tuple{UInt,UInt}
     while !all(map(x -> x.collapsed, grid.cells))
         collapse!(grid)
     end
-    image_grid = map(x -> (x.current_tiles |> collect |> first).tile_ID, grid.cells)
+    image_grid = map(x -> (x.current_tiles |> collect |> first).tile_id, grid.cells)
     return image_grid
 end
 
-test(a) = collect(a.current_tiles)[1].tile_ID
+test(a) = collect(a.current_tiles)[1].tile_id
 
 function wave_function_collapse(tile_set::Set{Tile}, grid_size::Tuple{Int,Int})::Matrix{TileID}
     grid_size = convert(Tuple{UInt,UInt}, grid_size)
@@ -45,16 +45,16 @@ end
 function create_image_map(tile_set::Set{Tile}, basic_image_data::Dict{UInt,Matrix})
 
 
-    transformed_tiles = filter(x -> !basic(x.tile_ID), collect(tile_set))
+    transformed_tiles = filter(x -> !basic(x.tile_id), collect(tile_set))
     image_data = Dict(map(x -> (new_basic_tile_id(x[1]), x[2]), collect(basic_image_data)))
 
     for tile in transformed_tiles
 
-        tile_image = reduce((x, _) -> rotr90(x), 1:tile.tile_ID.rotation, init=image_data[new_basic_tile_id(tile.tile_ID.id)])
-        if tile.tile_ID.mirrored
+        tile_image = reduce((x, _) -> rotr90(x), 1:tile.tile_id.rotation, init=image_data[new_basic_tile_id(tile.tile_id.id)])
+        if tile.tile_id.mirrored
             tile_image = tile_image[end:-1:1, :]
         end
-        image_data[tile.tile_ID] = tile_image
+        image_data[tile.tile_id] = tile_image
 
     end
     return image_data

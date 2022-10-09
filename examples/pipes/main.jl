@@ -24,15 +24,15 @@ tile_set = Set([
     WFC.create_tile_set(tiles[4], 2, false)...,
     WFC.create_tile_set(tiles[5], 1, false)...
 ])
-println(map(x -> x.tile_ID, collect(tile_set)))
+println(map(x -> x.tile_id, collect(tile_set)))
 image_grid = WFC.wave_function_collapse(tile_set, (12, 12))
 #println(image)
 
 
 
 
-#image_map = Dict(map(x -> (x.tile_ID, FileIO.load(string(@__DIR__,"/tiles/Tile", x.tile_ID[1], ".png"))), tiles))
-basic_image_data = Dict(map(x -> (x.tile_ID.id, FileIO.load(string(@__DIR__, "/tiles/Tile", x.tile_ID.id, ".png"))), tiles))
+#image_map = Dict(map(x -> (x.tile_id, FileIO.load(string(@__DIR__,"/tiles/Tile", x.tile_id[1], ".png"))), tiles))
+basic_image_data = Dict(map(x -> (x.tile_id.id, FileIO.load(string(@__DIR__, "/tiles/Tile", x.tile_id.id, ".png"))), tiles))
 
 
 image_map = WFC.create_image_map(tile_set, basic_image_data)

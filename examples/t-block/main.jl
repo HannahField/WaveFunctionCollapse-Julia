@@ -12,7 +12,7 @@ tiles = [
 
 image = WFC.wave_function_collapse(Set(tiles),(8,8))
 
-image_map = Dict(map(x -> (x.tile_ID, FileIO.load(string(@__DIR__,"/tiles/Tile", x.tile_ID, ".png"))), tiles))
+image_map = Dict(map(x -> (x.tile_id, FileIO.load(string(@__DIR__,"/tiles/Tile", x.tile_id, ".png"))), tiles))
 
 image_data = WFC.create_image(image,image_map)
 
