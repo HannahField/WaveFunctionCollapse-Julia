@@ -1,4 +1,4 @@
-struct Grid
+struct Grid 
     cells::Matrix{Cell}
     tile_compatibility::Dict{Tile,TileCompatibility}
 end
