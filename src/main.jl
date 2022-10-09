@@ -25,11 +25,14 @@ end
 
 
 
-function wave_function_collapse(tile_set::Set{Tile}, grid_size::Tuple{UInt,UInt})::Matrix{TileID}
+function wave_function_collapse(tile_set::Set{Tile}, grid_size::Tuple{UInt,UInt}; callback=x -> nothing)::Matrix{TileID}
     grid = Grid(map(_ -> base_cell(tile_set), ones(grid_size)), Dict(map(x -> (x, find_compatibility(x, tile_set)), collect(tile_set))))
-
+    dump(find_compatibility(rand(tile_set), tile_set))
+    grid_size_total = grid_size[1] * grid_size[2]
     while !all(map(x -> x.collapsed, grid.cells))
         collapse!(grid)
+        num_of_collapsed_cells = length(filter(x -> x.collapsed, grid.cells))
+        callback(num_of_collapsed_cells / grid_size_total)
     end
     image_grid = map(x -> (x.current_tiles |> collect |> first).tile_id, grid.cells)
     return image_grid
@@ -37,12 +40,12 @@ end
 
 test(a) = collect(a.current_tiles)[1].tile_id
 
-function wave_function_collapse(tile_set::Set{Tile}, grid_size::Tuple{Int,Int})::Matrix{TileID}
+function wave_function_collapse(tile_set::Set{Tile}, grid_size::Tuple{Int,Int}; callback=x -> nothing)::Matrix{TileID}
     grid_size = convert(Tuple{UInt,UInt}, grid_size)
-    wave_function_collapse(tile_set, grid_size)
+    wave_function_collapse(tile_set, grid_size, callback=callback)
 end
 
-function create_image_map(tile_set::Set{Tile}, basic_image_data::Dict{UInt,Matrix})
+function create_image_map(tile_set::Set{Tile}, basic_image_data)
 
 
     transformed_tiles = filter(x -> !basic(x.tile_id), collect(tile_set))

@@ -3,26 +3,30 @@ using Pkg
 using Images
 using FileIO
 # GREEN 1; RED 2; GREEN BLACK RED 3; RED BLACK GREEN 4;
-tiles = [
-    WFC.Tile(3, 2, 3, 1, 1),
-    WFC.Tile(4, 1, 4, 2, 2),
-    WFC.Tile(2, 4, 1, 4, 3),
-    WFC.Tile(1, 3, 2, 3, 4),
-    WFC.Tile(4, 3, 2, 2, 5), 
-    WFC.Tile(2, 4, 4, 2, 6),
-    WFC.Tile(4, 1, 1, 4, 7),
-    WFC.Tile(3, 4, 1, 1, 8),
-    WFC.Tile(1, 3, 3, 1, 9),
-    WFC.Tile(1, 1, 4, 3, 10),
-    WFC.Tile(2, 2, 3, 4, 11),
-    WFC.Tile(3, 2, 2, 3, 12),
-    WFC.Tile(1, 1, 1, 1, 13),
-    WFC.Tile(2, 2, 2, 2, 14),
-]
 
-image = WFC.wave_function_collapse(Set(tiles),(16,16))
 
-image_map = Dict(map(x -> (x.tile_ID, FileIO.load(string(@__DIR__,"/tiles/", x.tile_ID, ".png"))), tiles))
+tile_set = Set([
+    #WFC.create_tile_set(WFC.Sockets(3, 2, 3, 1), 1, 4, false)...,
+    WFC.create_tile_set(WFC.Sockets(4, 3, 2, 2), 2, 2, true)...,
+    #WFC.create_tile_set(WFC.Sockets(3, 4, 1, 1), 3, 4, false)...,
+    #WFC.create_tile_set(WFC.Sockets(1, 1, 1, 1), 4, 1, false)...,
+    #WFC.create_tile_set(WFC.Sockets(2, 2, 2, 2), 5, 1, false)...,
+    ])
 
-image_data = WFC.create_image(image,image_map)
-FileIO.save(string(@__DIR__,"/example",".png"),image_data)
+
+
+tile_ids = Set(map(x -> x.tile_id.id, collect(tile_set)))
+
+image_grid = WFC.wave_function_collapse(tile_set, (2, 2), callback=x -> println(round(Int, x * 100)))
+
+
+
+basic_image_data = Dict(map(x -> (x, FileIO.load(string(@__DIR__, "/tiles/", x, ".png"))), collect(tile_ids)))
+
+
+image_map = WFC.create_image_map(tile_set, basic_image_data)
+
+
+image_data = WFC.create_image(image_grid, image_map)
+
+FileIO.save(string(@__DIR__, "/test.png"), image_data)

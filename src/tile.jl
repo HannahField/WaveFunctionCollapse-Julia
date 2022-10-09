@@ -4,16 +4,19 @@ struct TileID
     rotation::UInt
     mirrored::Bool
 end
+struct Sockets
+    north_socket_id::UInt
+    east_socket_id::UInt
+    south_socket_id::UInt
+    west_socket_id::UInt
+end
 
 basic(tile_id::TileID) = tile_id.rotation == 0 && !tile_id.mirrored
 
 new_basic_tile_id(id::Integer) = TileID(id, 0, false)
 
 struct Tile
-    north_socket_id::UInt
-    east_socket_id::UInt
-    south_socket_id::UInt
-    west_socket_id::UInt
+    sockets::Sockets
     tile_id::TileID
 end
 
@@ -26,32 +29,37 @@ struct TileCompatibility
 end
 
 function find_compatibility(tile::Tile, tiles::Set{Tile})
-    north_compatibility = Set(filter(x -> x.south_socket_id == tile.north_socket_id, tiles))
-    east_compatibility = Set(filter(x -> x.west_socket_id == tile.east_socket_id, tiles))
-    south_compatibility = Set(filter(x -> x.north_socket_id == tile.south_socket_id, tiles))
-    west_compatibility = Set(filter(x -> x.east_socket_id == tile.west_socket_id, tiles))
+    north_compatibility = Set(filter(x -> x.sockets.south_socket_id == tile.sockets.north_socket_id, tiles))
+    east_compatibility = Set(filter(x -> x.sockets.west_socket_id == tile.sockets.east_socket_id, tiles))
+    south_compatibility = Set(filter(x -> x.sockets.north_socket_id == tile.sockets.south_socket_id, tiles))
+    west_compatibility = Set(filter(x -> x.sockets.east_socket_id == tile.sockets.west_socket_id, tiles))
     return TileCompatibility(tile, north_compatibility, east_compatibility, south_compatibility, west_compatibility)
 end
 
-function create_tile_set(tile::Tile, rotation::Int, reflection::Bool)
-    tile_set = Set([tile])
+function create_tile_set(sockets::Sockets, id::Int, rotation::Int, reflection::Bool)
+    basic_tile = Tile(sockets, new_basic_tile_id(id))
+    tile_set = Set([basic_tile])
 
     rotated_tiles = @match rotation begin
         1 => []
-        2 => [rotate_tile(rotate_tile(tile))]
+        2 => [rotate_tile(basic_tile)]
         4 => [
-            rotate_tile(tile),
-            rotate_tile(rotate_tile(tile)),
-            rotate_tile(rotate_tile(rotate_tile(tile)))
+            rotate_tile(basic_tile),
+            rotate_tile(rotate_tile(basic_tile)),
+            rotate_tile(rotate_tile(rotate_tile(basic_tile)))
         ]
     end
     tile_set = union(tile_set, Set(rotated_tiles))
     if reflection
-        reflected_tile = Tile(new_tile.south_socket_id, new_tile.east_socket_id, new_tile.north_socket_id, new_tile.west_socket_id, (new_tile.tile_id.id, 0, true))
-        tile_set = union(tile_set, Set(reflected_tile))
+        reflected_tile = Tile(Sockets(basic_tile.sockets.south_socket_id,
+        basic_tile.sockets.east_socket_id,
+        basic_tile.sockets.north_socket_id,
+        basic_tile.sockets.west_socket_id),
+            TileID(basic_tile.tile_id.id, 0, true))
+        tile_set = union(tile_set, Set([reflected_tile]))
         rotated_reflected_tiles = @match rotation begin
             1 => []
-            2 => [rotate_tile(rotate_tile(reflected_tile))]
+            2 => [rotate_tile(reflected_tile)]
             4 => [
                 rotate_tile(reflected_tile),
                 rotate_tile(rotate_tile(reflected_tile)),
@@ -64,10 +72,12 @@ function create_tile_set(tile::Tile, rotation::Int, reflection::Bool)
 end
 
 rotate_tile(tile::Tile)::Tile = Tile(
-    tile.west_socket_id,
-    tile.north_socket_id,
-    tile.east_socket_id,
-    tile.south_socket_id,
+    Sockets(
+        tile.sockets.west_socket_id,
+        tile.sockets.north_socket_id,
+        tile.sockets.east_socket_id,
+        tile.sockets.south_socket_id
+    ),
     TileID(
         tile.tile_id.id,
         tile.tile_id.rotation + 1,

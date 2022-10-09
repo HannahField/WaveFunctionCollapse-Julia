@@ -2,29 +2,29 @@ include("../../src/main.jl")
 using Pkg
 using Images
 using FileIO
-tiles = [
-    WFC.Tile(0, 0, 0, 0, 0),
-    WFC.Tile(1, 0, 0, 0, 1),
-    WFC.Tile(0, 1, 0, 0, 2),
-    WFC.Tile(1, 1, 0, 0, 3),
-    WFC.Tile(0, 0, 1, 0, 4),
-    WFC.Tile(1, 0, 1, 0, 5), 
-    WFC.Tile(0, 1, 1, 0, 6),
-    WFC.Tile(1, 1, 1, 0, 7),
-    WFC.Tile(0, 0, 0, 1, 8),
-    WFC.Tile(1, 0, 0, 1, 9),
-    WFC.Tile(0, 1, 0, 1, 10),
-    WFC.Tile(1, 1, 0, 1, 11),
-    WFC.Tile(0, 0, 1, 1, 12),
-    WFC.Tile(1, 0, 1, 1, 13),
-    WFC.Tile(0, 1, 1, 1, 14),
-    WFC.Tile(1, 1, 1, 1, 15)
-]
 
-image = WFC.wave_function_collapse(Set(tiles),(8,8))
 
-image_map = Dict(map(x -> (x.tile_ID, FileIO.load(string(@__DIR__,"/tiles/", x.tile_ID, ".png"))), tiles))
 
-image_data = WFC.create_image(image,image_map)
+tile_set = Set([
+    WFC.create_tile_set(WFC.Sockets(0, 0, 0, 0), 1, 1, false)...,
+    WFC.create_tile_set(WFC.Sockets(1, 0, 0, 0), 2, 4, false)...,
+    WFC.create_tile_set(WFC.Sockets(1, 1, 0, 0), 3, 4, false)...,
+    WFC.create_tile_set(WFC.Sockets(1, 0, 1, 0), 4, 2, false)...,
+    WFC.create_tile_set(WFC.Sockets(1, 1, 1, 0), 5, 4, false)...,
+    WFC.create_tile_set(WFC.Sockets(1, 1, 1, 1), 6, 1, false)...,])
 
-FileIO.save(string(@__DIR__,"/example.png"),image_data)
+tile_ids = Set(map(x -> x.tile_id.id, collect(tile_set)))
+
+image_grid = WFC.wave_function_collapse(tile_set, (16, 16), callback=x -> println(round(Int, x * 100)))
+
+
+
+basic_image_data = Dict(map(x -> (x, FileIO.load(string(@__DIR__, "/tiles/", x, ".png"))), collect(tile_ids)))
+
+
+image_map = WFC.create_image_map(tile_set, basic_image_data)
+
+
+image_data = WFC.create_image(image_grid, image_map)
+
+FileIO.save(string(@__DIR__, "/test.png"), image_data)
