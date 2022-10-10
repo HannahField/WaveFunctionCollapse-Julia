@@ -1,5 +1,7 @@
 name = "WFC"
-version = "0.0.1"
+uuid = "cf10619b-5382-40e2-8a33-4e27da5ca10e"
+authors = []
+version = "0.1.0"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
