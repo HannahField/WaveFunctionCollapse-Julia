@@ -1,7 +1,5 @@
 module WFC
 
-using Pkg
-Pkg.activate(".")
 using Match
 using Images
 using FileIO
