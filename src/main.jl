@@ -1,5 +1,3 @@
-module WFC
-
 using Match
 using Images
 using FileIO
@@ -59,5 +57,4 @@ function create_image_map(tile_set::Set{Tile}, basic_image_data)
 
     end
     return image_data
-end
 end
